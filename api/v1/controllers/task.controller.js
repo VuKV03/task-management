@@ -86,3 +86,28 @@ module.exports.changeStatus = async (req, res) => {
     });
   }
 };
+
+// [GET] /api/v1/tasks/change-multi
+module.exports.changeMulti = async (req, res) => {
+  const { ids, status } = req.body;
+
+  const listStatus = ["initial", "doing", "finish", "pending", "notFinish"];
+
+  if(listStatus.includes(status)) {
+    await Task.updateMany({
+      _id: { $in: ids }
+    }, {
+      status: status
+    });
+
+    res.json({
+      code: 200,
+      message: "Đổi trạng thái thành công!"
+    });
+  } else {
+    res.json({
+      code: 400,
+      message: `Trạng thái ${status} không hợp lệ!`
+    });
+  }
+};
