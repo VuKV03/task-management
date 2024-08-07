@@ -69,20 +69,23 @@ module.exports.changeStatus = async (req, res) => {
     const id = req.params.id;
     const status = req.body.status;
 
-    await Task.updateOne({
-      _id: id
-    }, {
-      status: status
-    });
+    await Task.updateOne(
+      {
+        _id: id,
+      },
+      {
+        status: status,
+      }
+    );
 
     res.json({
       code: 200,
-      message: "Cập nhật trạng thái thành công!"
+      message: "Cập nhật trạng thái thành công!",
     });
   } catch (error) {
     res.json({
       code: 400,
-      message: "Không tồn tại!"
+      message: "Không tồn tại!",
     });
   }
 };
@@ -93,43 +96,46 @@ module.exports.changeMulti = async (req, res) => {
 
   const listStatus = ["initial", "doing", "finish", "pending", "notFinish"];
 
-  if(listStatus.includes(status)) {
-    await Task.updateMany({
-      _id: { $in: ids }
-    }, {
-      status: status
-    });
+  if (listStatus.includes(status)) {
+    await Task.updateMany(
+      {
+        _id: { $in: ids },
+      },
+      {
+        status: status,
+      }
+    );
 
     res.json({
       code: 200,
-      message: "Đổi trạng thái thành công!"
+      message: "Đổi trạng thái thành công!",
     });
   } else {
     res.json({
       code: 400,
-      message: `Trạng thái ${status} không hợp lệ!`
+      message: `Trạng thái ${status} không hợp lệ!`,
     });
   }
 };
 
 // [POST] /api/v1/tasks/create
 module.exports.create = async (req, res) => {
-  try{
+  try {
     const task = new Task(req.body);
     const data = await task.save();
 
     res.json({
       code: 200,
       message: "Tạo thành công!",
-      data: data
+      data: data,
     });
   } catch (error) {
     res.json({
       code: 400,
-      message: "Lõi!"
-    })
+      message: "Lõi!",
+    });
   }
-}
+};
 
 // [PATCH] /api/v1/tasks/edit/:id
 module.exports.edit = async (req, res) => {
@@ -137,18 +143,72 @@ module.exports.edit = async (req, res) => {
     const id = req.params.id;
     const data = req.body;
 
-    await Task.updateOne({
-      _id: id
-    }, data);
+    await Task.updateOne(
+      {
+        _id: id,
+      },
+      data
+    );
 
     res.json({
       code: 200,
-      message: "Cập nhật công việc thành công!"
+      message: "Cập nhật công việc thành công!",
     });
   } catch (error) {
     res.json({
       code: 400,
+      message: "Lỗi!",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/delete/:id
+module.exports.delete = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    await Task.updateOne(
+      {
+        _id: id,
+      },
+      {
+        deleted: true,
+        deletedAt: new Date(),
+      }
+    );
+
+    res.json({
+      code: 200,
+      message: "Xóa công việc thành công!",
+    });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Lỗi!",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/delete-multi
+module.exports.deleteMulti = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+  await Task.updateMany({
+    _id: { $in: ids }
+  }, {
+    deleted: true,
+    deletedAt: new Date()
+  });
+
+  res.json({
+    code: 200,
+    message: "Xóa các công việc thành công!"
+  });
+  } catch (error) {
+    res.json({
+      code: 400,
       message: "Lỗi!"
-    })
+    });
   }
 };
