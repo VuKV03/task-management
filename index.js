@@ -1,23 +1,15 @@
 const express = require("express");
+const env = require("dotenv")
+env.config();
 const database = require("./config/database");
-require("dotenv").config();
+database.connect();
 const app = express();
 const port = process.env.PORT;
 
-database.connect();
+const routesApiV1 = require("./api/v1/routes/index.route");
 
-const Task = require("./models/task.model");
-
-app.get("/tasks", async (req, res) => {
-  const tasks = await Task.find({
-    deleted: false,
-  });
-
-  console.log(tasks);
-
-  res.send("Danh sách công việc");
-});
+routesApiV1(app);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
-})
+});
