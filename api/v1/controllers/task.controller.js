@@ -1,5 +1,6 @@
 const Task = require("../../../models/task.model");
 const paginationHelper = require("../../../helpers/pagination");
+const searchHelper = require("../../../helpers/search");
 
 // [GET] /api/v1/tasks
 module.exports.index = async (req, res) => {
@@ -33,6 +34,14 @@ module.exports.index = async (req, res) => {
     countTasks
   );
   // End Pagination
+
+  // Search
+  let objSearch = searchHelper(req.query);
+
+  if(req.query.keyword) {
+    find.title = objSearch.regex;
+  } 
+  // End Search
 
   const tasks = await Task.find(find)
     .sort(sort)
