@@ -5,6 +5,7 @@ const searchHelper = require("../../../helpers/search");
 // [GET] /api/v1/tasks
 module.exports.index = async (req, res) => {
   const find = {
+    $or: [{ createdBy: req.user.id }, { listUser: req.user.id }],
     deleted: false,
   };
 
@@ -195,21 +196,24 @@ module.exports.deleteMulti = async (req, res) => {
   try {
     const { ids } = req.body;
 
-  await Task.updateMany({
-    _id: { $in: ids }
-  }, {
-    deleted: true,
-    deletedAt: new Date()
-  });
+    await Task.updateMany(
+      {
+        _id: { $in: ids },
+      },
+      {
+        deleted: true,
+        deletedAt: new Date(),
+      }
+    );
 
-  res.json({
-    code: 200,
-    message: "Xóa các công việc thành công!"
-  });
+    res.json({
+      code: 200,
+      message: "Xóa các công việc thành công!",
+    });
   } catch (error) {
     res.json({
       code: 400,
-      message: "Lỗi!"
+      message: "Lỗi!",
     });
   }
 };
